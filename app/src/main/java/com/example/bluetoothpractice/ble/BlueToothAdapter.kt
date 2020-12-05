@@ -1,12 +1,10 @@
 package com.example.bluetoothpractice.ble
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.algorigo.algorigoble.BleDevice
-import com.algorigo.algorigoble.BleManager
 import com.example.bluetoothpractice.R
 import com.example.bluetoothpractice.databinding.ItemBleBinding
 
@@ -19,9 +17,7 @@ class BlueToothAdapter : RecyclerView.Adapter<BlueToothAdapter.BlueToothViewHold
             LayoutInflater.from(parent.context),
             R.layout.item_ble, parent, false
         )
-        val holder =
-            BlueToothViewHolder(binding)
-        return holder
+        return BlueToothViewHolder(binding)
     }
 
     override fun getItemCount(): Int = items.size
