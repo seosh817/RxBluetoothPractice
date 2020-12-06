@@ -62,4 +62,7 @@ dependencies {
     // RxRelay
     implementation 'com.jakewharton.rxrelay2:rxrelay:2.1.0'
 
+    //lifecycle
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
+
 }

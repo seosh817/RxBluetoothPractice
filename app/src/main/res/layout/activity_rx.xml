@@ -4,24 +4,25 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="activity"
-            type="com.example.bluetoothpractice.MainActivity" />
+            type="com.example.bluetoothpractice.ui.rx.RxActivity" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MainActivity">
+        tools:context=".ui.MainActivity">
 
         <Button
             android:id="@+id/btn_scan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="@{()->activity.startScan()}"
             android:text="스캔"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:onClick="@{()->activity.startScan()}"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
@@ -33,16 +34,25 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btn_scan" />
 
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_ble_scan"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/btn_not_rx"
+            app:layout_constraintTop_toBottomOf="@id/btn_stop"
+            tools:listitem="@layout/item_ble" />
+
+        <Button
+            android:id="@+id/btn_not_rx"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{()->activity.navigateToNotRxActivity()}"
+            android:text="Rx사용 안하는 액티비티로"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:listitem="@layout/item_ble"
-            app:layout_constraintTop_toBottomOf="@id/btn_scan" />
-
-
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

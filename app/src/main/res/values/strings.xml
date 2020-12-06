@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">BluetoothPractice</string>
+    <string name="connecting"><![CDATA[Connecting(%1s)&#8230;]]></string>
 </resources>

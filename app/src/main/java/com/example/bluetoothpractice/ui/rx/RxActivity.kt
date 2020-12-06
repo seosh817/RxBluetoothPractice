@@ -1,23 +1,26 @@
-package com.example.bluetoothpractice
+package com.example.bluetoothpractice.ui.rx
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import com.algorigo.algorigoble.BleDevice
 import com.algorigo.algorigoble.BleManager
-import com.algorigo.algorigoble.impl.BleManagerImpl
-import com.example.bluetoothpractice.ble.BlueToothAdapter
-import com.example.bluetoothpractice.databinding.ActivityMainBinding
+import com.example.bluetoothpractice.MyDeviceDelegate
+import com.example.bluetoothpractice.MySampleDevice
+import com.example.bluetoothpractice.PermissionUtil
+import com.example.bluetoothpractice.R
+import com.example.bluetoothpractice.databinding.ActivityRxBinding
+import com.example.bluetoothpractice.ui.BlueToothRecyclerAdapter
+import com.example.bluetoothpractice.ui.DeviceInfoActivity
+import com.example.bluetoothpractice.ui.notrx.NotRxActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 
-class MainActivity : AppCompatActivity() {
-
+class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItemClickListener {
 
     //https://developer.android.com/guide/topics/connectivity/bluetooth
     // InitializableBleDevice는 BleDevice를 상속받은 구현체이다.
@@ -32,12 +35,15 @@ class MainActivity : AppCompatActivity() {
     // 기본적으로 값은 음수 값이며 값이 높을수록 (0에 가까울수록) 가까이 있다는 뜻이다.
 
     // BleManager는 블루투스의 Scan하는 기능을 담당함.
+    // 실제 scan 메소드들은 BleScanner에 있음
 
     // BluetoothProfile.ServiceListener
 
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityRxBinding
     private val blueToothAdapter by lazy {
-        BlueToothAdapter()
+        BlueToothRecyclerAdapter().apply {
+            onBlueToothItemClickListener = this@RxActivity
+        }
     }
 
     private lateinit var bleManager: BleManager
@@ -47,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_rx)
         binding.activity = this
         initRecyclerView()
         initBlueTooth()
@@ -69,21 +75,22 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    // question disposable 재정의
     fun startScan() {
         if (PermissionUtil.checkPermissions(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
 
-            connectionStateDisposable = bleManager.scanObservable(30000)
+            disposable = bleManager.scanObservable(30000)
                 .doOnSubscribe {
                     disposable = it
                     binding.btnScan.isEnabled = false
-                    blueToothAdapter.setItems(listOf())
+                    blueToothAdapter.items = listOf()
                     Log.d("seunghwan", it.toString())
                 }
                 .doOnDispose {
                     binding.btnScan.isEnabled = true
                 }
                 .subscribe({
-                    blueToothAdapter.setItems(it)
+                    blueToothAdapter.items = it
                     Log.d("seunghwan", it.toString())
                 }, {
                     binding.btnScan.isEnabled = true
@@ -102,6 +109,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun navigateToNotRxActivity() {
+        val intent = Intent(this, NotRxActivity::class.java)
+        startActivity(intent)
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -116,7 +128,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
+    // question
     override fun onResume() {
         super.onResume()
         connectionStateDisposable = bleManager.getConnectionStateObservable()
@@ -131,9 +143,37 @@ class MainActivity : AppCompatActivity() {
             })
     }
 
+    override fun onSelect(bleDevice: BleDevice) {
+        if (bleDevice.connected) {
+            when (bleDevice) {
+                is MySampleDevice -> {
+                    Intent(this@RxActivity, DeviceInfoActivity::class.java).apply {
+                        putExtra(DeviceInfoActivity.KEY_MAC_ADDRESS, bleDevice.macAddress)
+                    }.also {
+                        startActivity(it)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onButtonClick(bleDevice: BleDevice) {
+        when(bleDevice.connectionState) {
+            BleDevice.ConnectionState.CONNECTED -> {
+                bleDevice.disconnect()
+            }
+            BleDevice.ConnectionState.DISCONNECTED -> {
+                bleDevice.connect(false)
+            }
+            else -> {
+
+            }
+        }
+    }
+
 
     companion object {
-        private val TAG = MainActivity::class.java.simpleName
+        private val TAG = RxActivity::class.java.simpleName
 
         private const val REQUEST_CODE = 1
     }
