@@ -191,7 +191,7 @@ internal class SC01Device: InitializableBleDevice() {
     companion object {
         private val LOG_TAG = SC01Device::class.java.simpleName
 
-        private const val BLE_NAME = "Algorigo"
+        const val BLE_NAME = "Algorigo"
         private const val BLE_MANUFACTURER_ID = 89
         private val BLE_MANUFACTURER_SPECIFIC_DATA = byteArrayOf(2, 21, 31, 74, -26, -96, 0, 55, 64, 18, -126, 1, 39, 16, 102, 70, 0, 0, 0, -1, 0, -1, -61)
 

@@ -9,10 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.algorigo.algorigoble.BleDevice
 import com.algorigo.algorigoble.BleManager
-import com.example.bluetoothpractice.MyDeviceDelegate
-import com.example.bluetoothpractice.MySampleDevice
-import com.example.bluetoothpractice.PermissionUtil
-import com.example.bluetoothpractice.R
+import com.example.bluetoothpractice.*
+import com.example.bluetoothpractice.ble.SC01Device
 import com.example.bluetoothpractice.databinding.ActivityRxBinding
 import com.example.bluetoothpractice.ui.BlueToothRecyclerAdapter
 import com.example.bluetoothpractice.ui.DeviceInfoActivity
@@ -20,8 +18,8 @@ import com.example.bluetoothpractice.ui.notrx.NotRxActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_rx.*
 
 class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItemClickListener {
 
@@ -80,7 +78,7 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
     // question disposable 재정의
     fun startScan() {
         if (PermissionUtil.checkPermissions(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-            disposable = bleManager.scanObservable(30000)
+/*            disposable = bleManager.scanObservable(30000)
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe {
                     disposable = it
@@ -103,6 +101,28 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
                     Log.d("seunghwan", it.toString())
                 }, {
                     binding.btnScan.isEnabled = true
+                })*/
+
+            disposable = bleManager.scanObservable(30000)
+                .doOnSubscribe {
+                    disposable = it
+                    btn_scan.isEnabled = false
+                    blueToothAdapter.setItems(listOf())
+                }
+                .doOnDispose {
+                    btn_scan.isEnabled = true
+                }
+                .subscribe({
+                    blueToothAdapter.setItems(it)
+                }, {
+                    Log.e(TAG, "", it)
+                    btn_scan.isEnabled = true
+                    if (true) {
+                        val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                        startActivityForResult(intent, 1)
+                    }
+                }, {
+                    btn_scan.isEnabled = true
                 })
 
 /*            bleManager.scanObservable(30000)
@@ -163,11 +183,16 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
     override fun onSelect(bleDevice: BleDevice) {
         if (bleDevice.connected) {
             when (bleDevice) {
-                is MySampleDevice -> {
+                is MySampleDevice2 -> {
                     val intent = Intent(this@RxActivity, DeviceInfoActivity::class.java).apply {
                         putExtra(DeviceInfoActivity.KEY_MAC_ADDRESS, bleDevice.macAddress)
-                    }
-                    startActivity(intent)
+                    }.also { startActivity(intent) }
+                }
+                is SC01Device -> {
+                    val intent = Intent(this@RxActivity, DeviceInfoActivity::class.java).apply {
+                        putExtra(DeviceInfoActivity.KEY_MAC_ADDRESS, bleDevice.macAddress)
+                    }.also { startActivity(intent) }
+
                 }
             }
         }

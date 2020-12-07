@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.algorigo.algorigoble.BleManager
 import com.example.bluetoothpractice.MySampleDevice
+import com.example.bluetoothpractice.MySampleDevice2
 import com.example.bluetoothpractice.R
 import com.example.bluetoothpractice.databinding.ActivityDeviceInfoBinding
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -16,7 +17,7 @@ import kotlinx.android.synthetic.main.activity_device_info.*
 class DeviceInfoActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDeviceInfoBinding
-    private lateinit var mySampleDevice: MySampleDevice
+    private lateinit var mySampleDevice: MySampleDevice2
     private var disposable: Disposable? = null
 
 
@@ -25,22 +26,22 @@ class DeviceInfoActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_device_info)
 
         intent.getStringExtra(KEY_MAC_ADDRESS)?.let {
-            mySampleDevice = BleManager.getInstance().getDevice(it) as MySampleDevice
+            mySampleDevice = BleManager.getInstance().getDevice(it) as MySampleDevice2
         }
 
-        binding.periodEdit.setText(mySampleDevice.getVersion())
+        //binding.periodEdit.setText(mySampleDevice.getVersion())
         binding.setPeriodBtn.setOnClickListener {
             val value = binding.periodEdit.text.toString()
-            mySampleDevice.setVersionSingle(value)
+/*            mySampleDevice.setVersionSingle(value)
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe({
                     periodEdit.setText(it)
                 }, {
                     Log.d("seunghwan", it.toString())
-                })
+                })*/
         }
         binding.getPeriodBtn.setOnClickListener {
-            binding.periodEdit.setText(mySampleDevice.getVersion())
+            //binding.periodEdit.setText(mySampleDevice.getVersion())
         }
 
         binding.sendOffBtn.setOnClickListener {
