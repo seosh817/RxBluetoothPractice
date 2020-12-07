@@ -130,7 +130,7 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
 
 /*            bleManager.scanObservable(30000)
                 .doOnSubscribe {
-                    binding.btnScan.isEnabled = false
+                    binding.btnScan.isEnablRed = false
                     blueToothAdapter.items = listOf()
                     Log.d("seunghwan", it.toString())
                 }
@@ -246,7 +246,7 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
     override fun onPause() {
         super.onPause()
         connectionStateDisposable?.dispose()
-        //compositeDisposable.dispose()
+        disposable?.dispose()
     }
 
 

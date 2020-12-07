@@ -42,6 +42,7 @@ class SC01DeviceActivity : AppCompatActivity() {
         binding.etAmp.setText(sc01Device.getAmplification().toString())
         binding.setAmpBtn.setOnClickListener {
             val value = binding.etAmp.text.toString()
+            Log.d("seunghwan", binding.etAmp.toString())
             sc01Device.setAmplificationSingle(value.toInt())
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe({
@@ -55,8 +56,8 @@ class SC01DeviceActivity : AppCompatActivity() {
         }
 
 
-        binding.etAmp.setText(sc01Device.getAmplification().toString())
-        binding.setAmpBtn.setOnClickListener {
+        binding.etSens.setText(sc01Device.getAmplification().toString())
+        binding.btnSetSens.setOnClickListener {
             val value = binding.etAmp.text.toString()
             sc01Device.setAmplificationSingle(value.toInt())
                 ?.observeOn(AndroidSchedulers.mainThread())
@@ -66,21 +67,11 @@ class SC01DeviceActivity : AppCompatActivity() {
                     Log.d("seunghwan", it.toString())
                 })
         }
-        binding.getAmpBtn.setOnClickListener {
-            binding.etAmp.setText(sc01Device.getPotentiometer().toString())
+        binding.btnGetSens.setOnClickListener {
+            binding.etSens.setText(sc01Device.getPotentiometer().toString())
         }
 
-        binding.etSens.setText(sc01Device.getPotentiometer().toString())
-        binding.setAmpBtn.setOnClickListener {
-            val value = binding.etSens.text.toString()
-            sc01Device.setPotentiometerSingle(value.toInt())
-                ?.observeOn(AndroidSchedulers.mainThread())
-                ?.subscribe({
-                    binding.etSens.setText(it)
-                }, {
-                    Log.d("seunghwan", it.toString())
-                })
-        }
+
 
 
         binding.sendOffBtn.setOnClickListener {
