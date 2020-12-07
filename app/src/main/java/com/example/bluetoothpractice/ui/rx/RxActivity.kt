@@ -11,6 +11,7 @@ import com.algorigo.algorigoble.BleDevice
 import com.algorigo.algorigoble.BleManager
 import com.example.bluetoothpractice.*
 import com.example.bluetoothpractice.ble.SC01Device
+import com.example.bluetoothpractice.ble.SC01DeviceDelegate
 import com.example.bluetoothpractice.databinding.ActivityRxBinding
 import com.example.bluetoothpractice.ui.BlueToothRecyclerAdapter
 import com.example.bluetoothpractice.ui.DeviceInfoActivity
@@ -18,7 +19,6 @@ import com.example.bluetoothpractice.ui.notrx.NotRxActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_rx.*
 
 class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItemClickListener {
@@ -65,7 +65,7 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
     private fun initBlueTooth() {
         BleManager.init(this)
         bleManager = BleManager.getInstance().apply {
-            bleDeviceDelegate = MyDeviceDelegate()
+            bleDeviceDelegate = SC01DeviceDelegate()
         }
     }
 
@@ -104,6 +104,9 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
                 })*/
 
             disposable = bleManager.scanObservable(30000)
+                .doFinally {
+                    disposable = null
+                }
                 .doOnSubscribe {
                     disposable = it
                     btn_scan.isEnabled = false
@@ -182,19 +185,22 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
 
     override fun onSelect(bleDevice: BleDevice) {
         if (bleDevice.connected) {
-            when (bleDevice) {
+/*            when (bleDevice) {
                 is MySampleDevice2 -> {
-                    val intent = Intent(this@RxActivity, DeviceInfoActivity::class.java).apply {
+                    Intent(this@RxActivity, DeviceInfoActivity::class.java).apply {
                         putExtra(DeviceInfoActivity.KEY_MAC_ADDRESS, bleDevice.macAddress)
-                    }.also { startActivity(intent) }
+                    }.also { startActivity(it) }
                 }
                 is SC01Device -> {
-                    val intent = Intent(this@RxActivity, DeviceInfoActivity::class.java).apply {
+                    Intent(this@RxActivity, DeviceInfoActivity::class.java).apply {
                         putExtra(DeviceInfoActivity.KEY_MAC_ADDRESS, bleDevice.macAddress)
-                    }.also { startActivity(intent) }
+                    }.also { startActivity(it) }
 
                 }
-            }
+            }*/
+            Intent(this@RxActivity, SC01DeviceActivity::class.java).apply {
+                putExtra(DeviceInfoActivity.KEY_MAC_ADDRESS, bleDevice.macAddress)
+            }.also { startActivity(it) }
         }
     }
 
@@ -243,10 +249,6 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
         //compositeDisposable.dispose()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        compositeDisposable.dispose()
-    }
 
 
     companion object {

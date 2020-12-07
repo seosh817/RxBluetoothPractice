@@ -26,7 +26,8 @@ internal class SC01Device: InitializableBleDevice() {
     override fun initializeCompletable(): Completable {
         return Completable.concatArray(getAmplificationSingle()!!.doOnSuccess { amp = it }.ignoreElement(),
                 getPotentiometerSingle()!!.doOnSuccess { sens = it }.ignoreElement(),
-                getDataPeriodSingle()!!.doOnSuccess { dataPeriod = it }.ignoreElement())
+                getDataPeriodSingle()!!.doOnSuccess { dataPeriod = it }.ignoreElement()
+        )
     }
 
     override fun onDisconnected() {
@@ -106,6 +107,7 @@ internal class SC01Device: InitializableBleDevice() {
                     }
                 }
     }
+
 
     fun getAmplification(): Int {
         return amp

@@ -23,6 +23,7 @@
         </activity>
         <activity android:name=".ui.notrx.NotRxActivity"/>
         <activity android:name=".ui.DeviceInfoActivity"/>
+        <activity android:name=".SC01DeviceActivity"/>
     </application>
 
 </manifest>
