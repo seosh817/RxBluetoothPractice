@@ -6,7 +6,7 @@
     <data>
         <variable
             name="activity"
-            type="com.example.bluetoothpractice.MainActivity" />
+            type="com.example.bluetoothpractice.ui.notrx.NotRxActivity" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,7 +19,6 @@
             android:text="스캔"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:onClick="@{()->activity.startScan()}"
             app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -40,7 +39,7 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:listitem="@layout/item_ble"
-            app:layout_constraintTop_toBottomOf="@id/btn_scan" />
+            app:layout_constraintTop_toBottomOf="@id/btn_stop" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

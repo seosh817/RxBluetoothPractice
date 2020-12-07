@@ -29,6 +29,7 @@
             android:id="@+id/btn_stop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="@{()->activity.stopBtn()}"
             android:text="중지"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -41,18 +42,18 @@
             android:layout_height="0dp"
             android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@id/btn_not_rx"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btn_stop"
             tools:listitem="@layout/item_ble" />
 
-        <Button
-            android:id="@+id/btn_not_rx"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="@{()->activity.navigateToNotRxActivity()}"
-            android:text="Rx사용 안하는 액티비티로"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
+        <!--        <Button
+                    android:id="@+id/btn_not_rx"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{()->activity.navigateToNotRxActivity()}"
+                    android:text="Rx사용 안하는 액티비티로"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent" />-->
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -11,11 +11,7 @@ import kotlinx.android.synthetic.main.item_ble.view.*
 
 class BlueToothRecyclerAdapter : RecyclerView.Adapter<BlueToothRecyclerAdapter.BlueToothViewHolder>() {
 
-    var items: List<BleDevice> = mutableListOf<BleDevice>()
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
+    private val items = mutableListOf<BleDevice>()
     var onBlueToothItemClickListener: OnBlueToothItemClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BlueToothViewHolder {
@@ -35,6 +31,12 @@ class BlueToothRecyclerAdapter : RecyclerView.Adapter<BlueToothRecyclerAdapter.B
     }
 
 
+    fun setItems(list: List<BleDevice>) {
+        items.clear()
+        items.addAll(list)
+        notifyDataSetChanged()
+    }
+
 
     override fun getItemCount(): Int = items.size
 
@@ -51,7 +53,7 @@ class BlueToothRecyclerAdapter : RecyclerView.Adapter<BlueToothRecyclerAdapter.B
     class BlueToothViewHolder(private val binding: ItemBleBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: BleDevice) {
-            binding.tvBle.text = item.name
+            binding.tvBle.text = item.toString()
             when(item.connectionState) {
                 BleDevice.ConnectionState.CONNECTING -> {
                     binding.btnConnect.isEnabled = false
@@ -62,12 +64,12 @@ class BlueToothRecyclerAdapter : RecyclerView.Adapter<BlueToothRecyclerAdapter.B
                     binding.btnConnect.text ="Disconnect"
                 }
                 BleDevice.ConnectionState.DISCONNECTING -> {
-                    binding.btnConnect.isEnabled = true
-                    binding.btnConnect.text = "Connect"
+                    binding.btnConnect.isEnabled = false
+                    binding.btnConnect.text = "Disconnecting..."
                 }
                 BleDevice.ConnectionState.DISCONNECTED -> {
-                    binding.btnConnect.isEnabled = false
-                    binding.btnConnect.text = "Disconnect"
+                    binding.btnConnect.isEnabled = true
+                    binding.btnConnect.text = "Connect"
                 }
             }
         }

@@ -33,7 +33,7 @@ class MySampleDevice : InitializableBleDevice() {
             }
     }
 
-    fun getVersionSingle(): Single<String>? {
+    private fun getVersionSingle(): Single<String>? {
         return readCharacteristic(UUID.fromString(UUID_DATA_VERSION))
             ?.map {
                 version = it.contentToString()

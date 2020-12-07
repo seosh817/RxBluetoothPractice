@@ -16,7 +16,8 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="60dp"
-            android:gravity="center"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
             android:text="블루투스1" />
 
         <Button

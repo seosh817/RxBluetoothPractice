@@ -18,7 +18,10 @@ import com.example.bluetoothpractice.ui.BlueToothRecyclerAdapter
 import com.example.bluetoothpractice.ui.DeviceInfoActivity
 import com.example.bluetoothpractice.ui.notrx.NotRxActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.schedulers.Schedulers
 
 class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItemClickListener {
 
@@ -39,6 +42,8 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
 
     // BluetoothProfile.ServiceListener
 
+    private val compositeDisposable = CompositeDisposable()
+
     private lateinit var binding: ActivityRxBinding
     private val blueToothAdapter by lazy {
         BlueToothRecyclerAdapter().apply {
@@ -57,8 +62,6 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
         binding.activity = this
         initRecyclerView()
         initBlueTooth()
-
-
     }
 
     private fun initBlueTooth() {
@@ -74,14 +77,36 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
         }
     }
 
-
     // question disposable 재정의
     fun startScan() {
         if (PermissionUtil.checkPermissions(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-
             disposable = bleManager.scanObservable(30000)
+                .subscribeOn(Schedulers.io())
                 .doOnSubscribe {
                     disposable = it
+                    binding.btnScan.isEnabled = false
+                    blueToothAdapter.setItems(listOf())
+                    Log.d("seunghwan", it.toString())
+                }
+                .doOnDispose {
+                    binding.btnScan.isEnabled = true
+                }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    blueToothAdapter.setItems(it)
+                    Log.d("seunghwan", it.toString())
+                }, {
+                    binding.btnScan.isEnabled = true
+                    val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                    startActivityForResult(intent, 1)
+                    Log.d("seunghwan", it.toString())
+                }, {
+                    binding.btnScan.isEnabled = true
+                })
+
+/*            bleManager.scanObservable(30000)
+                .doOnSubscribe {
                     binding.btnScan.isEnabled = false
                     blueToothAdapter.items = listOf()
                     Log.d("seunghwan", it.toString())
@@ -89,6 +114,7 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
                 .doOnDispose {
                     binding.btnScan.isEnabled = true
                 }
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     blueToothAdapter.items = it
                     Log.d("seunghwan", it.toString())
@@ -99,7 +125,7 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
                     Log.d("seunghwan", it.toString())
                 }, {
                     binding.btnScan.isEnabled = true
-                })
+                }).addTo(compositeDisposable)*/
         } else {
             PermissionUtil.requestExternalPermissions(
                 this,
@@ -108,6 +134,11 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
             )
         }
     }
+
+    fun stopBtn() {
+        disposable?.dispose()
+    }
+
 
     fun navigateToNotRxActivity() {
         val intent = Intent(this, NotRxActivity::class.java)
@@ -128,37 +159,22 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
         }
     }
 
-    // question
-    override fun onResume() {
-        super.onResume()
-        connectionStateDisposable = bleManager.getConnectionStateObservable()
-            .observeOn(AndroidSchedulers.mainThread())
-            .doFinally {
-                connectionStateDisposable = null
-            }
-            .subscribe({
-                blueToothAdapter.notifyDataSetChanged()
-            }, {
-                connectionStateDisposable = null
-            })
-    }
 
     override fun onSelect(bleDevice: BleDevice) {
         if (bleDevice.connected) {
             when (bleDevice) {
                 is MySampleDevice -> {
-                    Intent(this@RxActivity, DeviceInfoActivity::class.java).apply {
+                    val intent = Intent(this@RxActivity, DeviceInfoActivity::class.java).apply {
                         putExtra(DeviceInfoActivity.KEY_MAC_ADDRESS, bleDevice.macAddress)
-                    }.also {
-                        startActivity(it)
                     }
+                    startActivity(intent)
                 }
             }
         }
     }
 
     override fun onButtonClick(bleDevice: BleDevice) {
-        when(bleDevice.connectionState) {
+        when (bleDevice.connectionState) {
             BleDevice.ConnectionState.CONNECTED -> {
                 bleDevice.disconnect()
             }
@@ -169,6 +185,42 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
 
             }
         }
+    }
+
+    // question
+    override fun onResume() {
+        super.onResume()
+        connectionStateDisposable = bleManager.getConnectionStateObservable()
+            .doFinally {
+                connectionStateDisposable = null
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                blueToothAdapter.notifyDataSetChanged()
+            }, {
+                connectionStateDisposable = null
+            })
+/*        bleManager.getConnectionStateObservable()
+            .doFinally {
+                connectionStateDisposable = null
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                blueToothAdapter.notifyDataSetChanged()
+            }, {
+                connectionStateDisposable = null
+            }).addTo(compositeDisposable)*/
+    }
+
+    override fun onPause() {
+        super.onPause()
+        connectionStateDisposable?.dispose()
+        //compositeDisposable.dispose()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable.dispose()
     }
 
 
