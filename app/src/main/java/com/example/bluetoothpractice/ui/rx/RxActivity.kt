@@ -105,7 +105,9 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
 
             disposable = bleManager.scanObservable(30000)
                 .doFinally {
-                    disposable = null
+                    if(disposable != null) {
+                        disposable?.dispose()
+                    }
                 }
                 .doOnSubscribe {
                     disposable = it
@@ -115,6 +117,7 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
                 .doOnDispose {
                     btn_scan.isEnabled = true
                 }
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     blueToothAdapter.setItems(it)
                 }, {
@@ -159,7 +162,9 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
     }
 
     fun stopBtn() {
-        disposable?.dispose()
+        if(disposable != null) {
+            disposable?.dispose()
+        }
     }
 
 
@@ -246,7 +251,9 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
     override fun onPause() {
         super.onPause()
         connectionStateDisposable?.dispose()
-        disposable?.dispose()
+        if(disposable!= null) {
+            disposable?.dispose()
+        }
     }
 
 

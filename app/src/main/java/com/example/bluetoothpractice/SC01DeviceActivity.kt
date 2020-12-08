@@ -30,7 +30,7 @@ class SC01DeviceActivity : AppCompatActivity() {
             sc01Device.setDataPeriodSingle(value.toInt())
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe({
-                    binding.periodEdit.setText(it)
+                    binding.periodEdit.setText(it.toString())
                 }, {
                     Log.d("seunghwan", it.toString())
                 })
@@ -46,7 +46,7 @@ class SC01DeviceActivity : AppCompatActivity() {
             sc01Device.setAmplificationSingle(value.toInt())
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe({
-                    binding.etAmp.setText(it)
+                    binding.etAmp.setText(it.toString())
                 }, {
                     Log.d("seunghwan", it.toString())
                 })
@@ -56,13 +56,15 @@ class SC01DeviceActivity : AppCompatActivity() {
         }
 
 
-        binding.etSens.setText(sc01Device.getAmplification().toString())
+        binding.etSens.setText(sc01Device.getPotentiometer().toString())
         binding.btnSetSens.setOnClickListener {
-            val value = binding.etAmp.text.toString()
-            sc01Device.setAmplificationSingle(value.toInt())
+            val value = binding.etSens.text.toString()
+            Log.d("seunghwan", binding.etSens.toString())
+            sc01Device.setPotentiometerSingle(value.toInt())
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe({
-                    binding.etAmp.setText(it)
+                    Log.d("seunghwan", it.toString())
+                    binding.etSens.setText(it.toString())
                 }, {
                     Log.d("seunghwan", it.toString())
                 })
