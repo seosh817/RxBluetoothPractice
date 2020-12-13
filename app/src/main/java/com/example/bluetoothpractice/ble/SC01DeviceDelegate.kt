@@ -5,13 +5,14 @@ import com.algorigo.algorigoble.BleDevice
 import com.algorigo.algorigoble.BleManager
 import com.algorigo.algorigoble.BleScanFilter
 import com.algorigo.algorigoble.BleScanSettings
+import com.example.bluetoothpractice.MySampleDevice2
 
 class SC01DeviceDelegate: BleManager.BleDeviceDelegate() {
 
     override fun createBleDevice(bluetoothDevice: BluetoothDevice): BleDevice? {
         return when(bluetoothDevice.name) {
             SC01Device.BLE_NAME -> SC01Device()
-            else -> null
+            else -> MySampleDevice2()
         }
     }
 

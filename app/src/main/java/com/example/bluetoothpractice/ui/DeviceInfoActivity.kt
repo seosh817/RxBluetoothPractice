@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import com.algorigo.algorigoble.BleDevice
 import com.algorigo.algorigoble.BleManager
 import com.example.bluetoothpractice.MySampleDevice
 import com.example.bluetoothpractice.MySampleDevice2
@@ -50,11 +51,23 @@ class DeviceInfoActivity : AppCompatActivity() {
                 disposable = null
             }
         }
+    }
 
 
+
+    sealed class BleData(val type: BleType) {
+        data class SC01Data(val keyMacAddress: String) : BleData(BleType.SC01)
+        data class OtherData(val keyMacAddress: String) : BleData(BleType.OTHER)
+    }
+
+    enum class BleType {
+        SC01,
+        OTHER
     }
 
     companion object {
         const val KEY_MAC_ADDRESS = "key_mac_address"
+        const val KEY_BLE_TYPE = "ble_type"
+
     }
 }

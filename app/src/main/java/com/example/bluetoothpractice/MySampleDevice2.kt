@@ -15,5 +15,6 @@ class MySampleDevice2: BleDevice() {
     companion object {
         private val TAG = MySampleDevice2::class.java.simpleName
 
+
     }
 }

@@ -40,8 +40,6 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
 
     // BluetoothProfile.ServiceListener
 
-    private val compositeDisposable = CompositeDisposable()
-
     private lateinit var binding: ActivityRxBinding
     private val blueToothAdapter by lazy {
         BlueToothRecyclerAdapter().apply {
@@ -65,7 +63,7 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
     private fun initBlueTooth() {
         BleManager.init(this)
         bleManager = BleManager.getInstance().apply {
-            bleDeviceDelegate = SC01DeviceDelegate()
+            bleDeviceDelegate = MyDeviceDelegate()
         }
     }
 
@@ -105,9 +103,7 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
 
             disposable = bleManager.scanObservable(30000)
                 .doFinally {
-                    if(disposable != null) {
-                        disposable?.dispose()
-                    }
+                    disposable?.dispose()
                 }
                 .doOnSubscribe {
                     disposable = it
@@ -162,7 +158,7 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
     }
 
     fun stopBtn() {
-        if(disposable != null) {
+        if (disposable != null) {
             disposable?.dispose()
         }
     }
@@ -190,22 +186,22 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
 
     override fun onSelect(bleDevice: BleDevice) {
         if (bleDevice.connected) {
-/*            when (bleDevice) {
+            when (bleDevice) {
                 is MySampleDevice2 -> {
                     Intent(this@RxActivity, DeviceInfoActivity::class.java).apply {
                         putExtra(DeviceInfoActivity.KEY_MAC_ADDRESS, bleDevice.macAddress)
+                        putExtra(DeviceInfoActivity.KEY_BLE_TYPE, DeviceInfoActivity.BleType.OTHER)
                     }.also { startActivity(it) }
                 }
                 is SC01Device -> {
                     Intent(this@RxActivity, DeviceInfoActivity::class.java).apply {
-                        putExtra(DeviceInfoActivity.KEY_MAC_ADDRESS, bleDevice.macAddress)
+                        putExtra(
+                            DeviceInfoActivity.KEY_MAC_ADDRESS,
+                            DeviceInfoActivity.BleType.SC01
+                        )
                     }.also { startActivity(it) }
-
                 }
-            }*/
-            Intent(this@RxActivity, SC01DeviceActivity::class.java).apply {
-                putExtra(DeviceInfoActivity.KEY_MAC_ADDRESS, bleDevice.macAddress)
-            }.also { startActivity(it) }
+            }
         }
     }
 
@@ -251,11 +247,10 @@ class RxActivity : AppCompatActivity(), BlueToothRecyclerAdapter.OnBlueToothItem
     override fun onPause() {
         super.onPause()
         connectionStateDisposable?.dispose()
-        if(disposable!= null) {
+        if (disposable != null) {
             disposable?.dispose()
         }
     }
-
 
 
     companion object {
